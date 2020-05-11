@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>象棋</title>
+    <script src="./js/chinese-chess.js"></script>
+    <script src="./js/chess-piece.js"></script>
+
+    <style type="text/css">
+        @font-face {
+            font-family: qiti;
+            src: url(./font/qiti.ttf)
+        }
+    </style>
+</head>
+<body style="font-family: qiti;">
+    <div id="content" style="text-align: center;">
+        <span style="font-family: qiti;font-size: 40px;user-select:none">中国象棋</span><br>
+        <canvas id="chineseChess"  style="border:3px solid #c88f6a;">
+        </canvas>
+        
+    </div>
+</body>
+<script type="">
+    window.onload = ()=>{
+        const chessEl = document.getElementById("chess");
+    
+        const chineseChess = new ChineseChess("chineseChess");
+        chineseChess.init(80,40);
+        
+    }
+</script>
+</html>
