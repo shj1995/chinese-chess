@@ -21,6 +21,8 @@ export default class ChineseChess {
     /** 当前选中的棋子 */
     currentSelectPrice = null;
 
+    nextGroup = 'black'
+
     reasonableSet = null;
 
     constructor(elementId) {
@@ -43,6 +45,10 @@ export default class ChineseChess {
             if (this.currentSelectPrice == null && this.chessPieces[rowIndex][colIndex] != null) {
                 this.currentSelectPrice = new Point(rowIndex, colIndex);
                 const selectedPiece = this.chessPieces[rowIndex][colIndex]
+                if (this.nextGroup !== selectedPiece.color) {
+                    alert("该您了吗？");
+                    return;
+                }
                 this.reasonableSet = CheckerFactory.getReasonableSet(selectedPiece, this.currentSelectPrice, this);
             } else if (this.currentSelectPrice && (this.currentSelectPrice.x !== rowIndex || this.currentSelectPrice.y !== colIndex)) {
                 const from = this.currentSelectPrice;
@@ -56,6 +62,7 @@ export default class ChineseChess {
                     this.chessPieces[rowIndex][colIndex] = this.chessPieces[this.currentSelectPrice.x][this.currentSelectPrice.y]
                     this.chessPieces[this.currentSelectPrice.x][this.currentSelectPrice.y] = null;
                 }
+                this.nextGroup = this.nextGroup === 'black' ? 'maroon' : 'black';
                 this.reasonableSet = null;
                 this.currentSelectPrice = null;
             } else if (this.currentSelectPrice && this.currentSelectPrice.x === rowIndex && this.currentSelectPrice.y === colIndex) {
