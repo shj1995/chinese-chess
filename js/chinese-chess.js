@@ -58,7 +58,7 @@ export default class ChineseChess {
                 }
                 this.reasonableSet = null;
                 this.currentSelectPrice = null;
-            } else if (this.currentSelectPrice.x === rowIndex && this.currentSelectPrice.y === colIndex) {
+            } else if (this.currentSelectPrice && this.currentSelectPrice.x === rowIndex && this.currentSelectPrice.y === colIndex) {
                 //这次点击和上次点击一样。表示取消选中。
                 this.reasonableSet = null;
                 this.currentSelectPrice = null;
