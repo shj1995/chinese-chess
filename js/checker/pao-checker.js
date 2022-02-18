@@ -23,7 +23,7 @@ export default class PaoChecker {
         // 往上
         for (let i = x - 1; i >= 0; i--) {
             if (chineseChess.chessPieces[i][y]) {
-                while (i >= 0) {
+                while (i > 0) {
                     i--;
                     if (chineseChess.chessPieces[i][y]) {
                         reasonableSet.add(new Point(i, y).toString());
@@ -37,7 +37,7 @@ export default class PaoChecker {
         // 往下
         for (let i = x + 1; i <= 9; i++) {
             if (chineseChess.chessPieces[i][y]) {
-                while (i <= 9) {
+                while (i < 9) {
                     i++;
                     if (chineseChess.chessPieces[i][y]) {
                         reasonableSet.add(new Point(i, y).toString());
@@ -51,7 +51,7 @@ export default class PaoChecker {
         // 往左
         for (let i = y - 1; i >= 0; i--) {
             if (chineseChess.chessPieces[x][i]) {
-                while (i >= 0) {
+                while (i > 0) {
                     i--;
                     if (chineseChess.chessPieces[x][i]) {
                         reasonableSet.add(new Point(x, i).toString());
@@ -65,7 +65,7 @@ export default class PaoChecker {
         // 往右
         for (let i = y + 1; i <= 8; i++) {
             if (chineseChess.chessPieces[x][i]) {
-                while (i <= 8) {
+                while (i < 8) {
                     i++;
                     if (chineseChess.chessPieces[x][i]) {
                         reasonableSet.add(new Point(x, i).toString());
