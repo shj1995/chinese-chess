@@ -1,7 +1,11 @@
+import CheckerFactory from "./checker/checker-factory.js";
+import ChessPiece from "./chess-piece.js";
+import Point from "./point.js";
+
 /**
  * 象棋类
  */
-class ChineseChess {
+export default class ChineseChess {
     /** 棋子的画布，二维数组，9*10个格子 */
     chessPieceCanvasEl;
     /** 棋盘的画布 */
@@ -17,6 +21,8 @@ class ChineseChess {
     /** 当前选中的棋子 */
     currentSelectPrice = null;
 
+    reasonableSet = null;
+
     constructor(elementId) {
         this.chessBoardCanvasEl = document.getElementById(elementId);
         this.chessPieces = [];
@@ -28,29 +34,39 @@ class ChineseChess {
         }
         const canvas = this.chessBoardCanvasEl;
         this.chessBoardCanvasEl.addEventListener("click", (e) => {
-
             const x = e.pageX - canvas.getBoundingClientRect().left;
             const y = e.pageY - canvas.getBoundingClientRect().top;
-            const rowIndex = Math.floor(y / 80);
-            const colIndex = Math.floor(x / 80);
+            const rowIndex = Math.floor(y / this.chessPieceSize);
+            const colIndex = Math.floor(x / this.chessPieceSize);
             const ctx = this.chessBoardCanvasEl.getContext("2d");
-            console.log(rowIndex);
-            console.log(colIndex);
-            console.log(this.currentSelectPrice);
-            
-            if (!this.currentSelectPrice && this.chessPieces[rowIndex][colIndex]) {
-                this.currentSelectPrice = new Point(rowIndex,colIndex);
-                this.initChessBoard(ctx);
-                this.renderChessPrices(ctx);
-            }else if(this.currentSelectPrice && (this.currentSelectPrice.x !=rowIndex || this.currentSelectPrice.y != colIndex )){
-                this.chessPieces[rowIndex][colIndex] = this.chessPieces[this.currentSelectPrice.x][this.currentSelectPrice.y]
-                this.chessPieces[this.currentSelectPrice.x][this.currentSelectPrice.y] = null;
-                this.initChessBoard(ctx);
-                this.renderChessPrices(ctx);
+            //如果当前未选中，并且当前选中位置有棋子，就做选中操作，否则就要做移动操作了。
+            if (this.currentSelectPrice == null && this.chessPieces[rowIndex][colIndex] != null) {
+                this.currentSelectPrice = new Point(rowIndex, colIndex);
+                const selectedPiece = this.chessPieces[rowIndex][colIndex]
+                this.reasonableSet = CheckerFactory.getReasonableSet(selectedPiece, this.currentSelectPrice, this);
+            } else if (this.currentSelectPrice && (this.currentSelectPrice.x !== rowIndex || this.currentSelectPrice.y !== colIndex)) {
+                const from = this.currentSelectPrice;
+                const to = new Point(rowIndex, colIndex);
+                if (from.x !== to.x || from.y !== to.y) {
+                    const selectedPiece = this.chessPieces[from.x][from.y]
+                    if (!CheckerFactory.check(selectedPiece, from, to, this)) {
+                        alert("您会吗？")
+                        return;
+                    }
+                    this.chessPieces[rowIndex][colIndex] = this.chessPieces[this.currentSelectPrice.x][this.currentSelectPrice.y]
+                    this.chessPieces[this.currentSelectPrice.x][this.currentSelectPrice.y] = null;
+                }
+                this.reasonableSet = null;
+                this.currentSelectPrice = null;
+            } else if (this.currentSelectPrice.x === rowIndex && this.currentSelectPrice.y === colIndex) {
+                //这次点击和上次点击一样。表示取消选中。
+                this.reasonableSet = null;
                 this.currentSelectPrice = null;
             }
+            this.initChessBoard(ctx);
+            this.renderChessPrices(ctx);
         });
-          
+
     }
 
     /**
@@ -76,7 +92,7 @@ class ChineseChess {
      * 初始化棋盘
      */
     initChessBoard(ctx) {
-        ctx.clearRect(0,0,this.width,this.height);  
+        ctx.clearRect(0, 0, this.width, this.height);
         const p = this.padding;
         const cps = this.chessPieceSize;
         ctx.strokeStyle = "#c88f6a"
@@ -137,6 +153,22 @@ class ChineseChess {
         }
     }
 
+    //画兵和炮的位置标记
+    drawReasonable(ctx, rowIndex, colIndex) {
+        const p = this.padding;
+        const cps = this.chessPieceSize;
+        const x = cps * colIndex + p;
+        const y = cps * rowIndex + p;
+        ctx.beginPath();
+        ctx.arc(x, y, cps / 7, 0, 2 * Math.PI);
+        ctx.fillStyle = "#c88f6a";
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "rgba(0, 0, 0, 1)";
+        ctx.fill();
+    }
+
     drawLine() {
         const ctx = arguments[0];
         for (var i = 1; i < arguments.length; i++) {
@@ -152,6 +184,8 @@ class ChineseChess {
 
     /** 初始化棋子 */
     initChessPrices() {
+        // this.chessPieces[5][4] = ChessPiece.HEI_MA;
+        // this.chessPieces[5][3] = ChessPiece.HEI_MA;
         this.chessPieces[0][0] = ChessPiece.HEI_JU;
         this.chessPieces[0][1] = ChessPiece.HEI_MA;
         this.chessPieces[0][2] = ChessPiece.HEI_XIANG;
@@ -195,6 +229,8 @@ class ChineseChess {
                 const piece = this.chessPieces[i][j];
                 if (piece instanceof ChessPiece) {
                     this.drawPrice(ctx, piece, i, j);
+                } else if (this.reasonableSet && this.reasonableSet.has(new Point(i, j).toString())) {
+                    this.drawReasonable(ctx, i, j);
                 }
             }
         }
@@ -208,7 +244,7 @@ class ChineseChess {
         const y = cps * rowIndex + p;
         ctx.font = this.chessPieceSize / 2 + "px qiti";
 
-        if(this.currentSelectPrice != null && this.currentSelectPrice.x == rowIndex && this.currentSelectPrice.y == colIndex){
+        if (this.currentSelectPrice != null && this.currentSelectPrice.x == rowIndex && this.currentSelectPrice.y == colIndex) {
 
             ctx.beginPath();
             ctx.arc(x, y, cps / 2, 0, 2 * Math.PI);
@@ -234,7 +270,7 @@ class ChineseChess {
         ctx.shadowOffsetY = 0;
         ctx.shadowBlur = 0;
         ctx.shadowColor = "";
-                    
+
         // ctx.beginPath();
         // ctx.arc(x, y, cps / 2.8, 0, 2 * Math.PI);
         // ctx.strokeStyle = "#ccc";
@@ -252,12 +288,4 @@ class ChineseChess {
 
     }
 
-}
-class Point {
-    x;
-    y;
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
 }

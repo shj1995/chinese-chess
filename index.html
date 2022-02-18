@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>象棋</title>
-    <script src="./js/chinese-chess.js"></script>
-    <script src="./js/chess-piece.js"></script>
-
     <style type="text/css">
         @font-face {
             font-family: qiti;
@@ -22,12 +19,13 @@
         
     </div>
 </body>
-<script type="">
+<script type="module">
+
+    import ChineseChess  from './js/chinese-chess.js';
+
     window.onload = ()=>{
-        const chessEl = document.getElementById("chess");
-    
         const chineseChess = new ChineseChess("chineseChess");
-        chineseChess.init(80,40);
+        chineseChess.init(30,15);
         
     }
 </script>
