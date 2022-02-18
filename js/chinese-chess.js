@@ -43,12 +43,12 @@ export default class ChineseChess {
             const ctx = this.chessBoardCanvasEl.getContext("2d");
             //如果当前未选中，并且当前选中位置有棋子，就做选中操作，否则就要做移动操作了。
             if (this.currentSelectPrice == null && this.chessPieces[rowIndex][colIndex] != null) {
-                this.currentSelectPrice = new Point(rowIndex, colIndex);
                 const selectedPiece = this.chessPieces[rowIndex][colIndex]
                 if (this.nextGroup !== selectedPiece.color) {
                     alert("该您了吗？");
                     return;
                 }
+                this.currentSelectPrice = new Point(rowIndex, colIndex);
                 this.reasonableSet = CheckerFactory.getReasonableSet(selectedPiece, this.currentSelectPrice, this);
             } else if (this.currentSelectPrice && (this.currentSelectPrice.x !== rowIndex || this.currentSelectPrice.y !== colIndex)) {
                 const from = this.currentSelectPrice;
